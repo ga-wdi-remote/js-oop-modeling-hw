@@ -60,13 +60,45 @@ track of whether tasks have been completed, it will also keep track of
 how long each task took to complete. Tasks can be grouped into 'projects' to
 keep them organized.
 
-> Answer here
+> Since this is a to-do list, a 'task' is a natural abstraction, and in any case
+> 'tasks' and 'projects' are both mentioned in the description. They are also
+> likely to have their own data (such as names and/or descriptions), so it
+> makes more sense to represent tasks as objects rather then just strings.
+>
+> A Task has:
+> -   a name
+> -   a time when it is begun
+> -   a time when it is completed
+>
+> A Project has:
+> -   a name
+> -   a description
+> -   a set of tasks
+>
 
 ### 2. Photo Sharing App
 
 In this app, users can upload photos to their accounts and share them with others. These photos can be grouped into albums.
 
-> Answer here
+> Based on the description, photos and albums are key parts of the app's
+> functionality, so making entities to represent them makes sense. However,
+> the description also mentions users -- maybe at some point we'll need to keep
+> track of which user uploaded which picture, or created which album. In that
+> case, it might make sense to represent a user as well.
+>
+> A Photo has:
+> -   a name
+> -   a date
+> -   a URL to where the image is hosted
+>
+> An Album has:
+> -   a name
+> -   a set of photos
+>
+> A User has:
+> -   a username
+> -   a set of photos that they've uploaded
+> -   a set of albums that they've created
 
 ### 3. Home Automation Manager
 
@@ -75,7 +107,24 @@ track of the time and temperature of the house that it monitors, and use that
 information to turn on and off different lights and adjust the thermostat up
 and down.
 
-> Answer here
+> This one's a bit trickier. The app isn't really recording or storing new data.
+> So what is there to represent? Well, for one, the house -- it surely has some
+> properties of its own. It might also make sense to model a light; at a
+> minimum, you'll need to be able to keep track of the current brightness level
+> of each light in order to know how to change it. It might also make sense to
+> keep track of each light's location, or to give each light a name for greater
+> usability. The thermostat may or may not need to be its own entity; if a house
+> only has one thermostat, maybe that information could be stored as a property
+> of the house. For now, I'm prepare to make that assumption.
+>
+> A Light has:
+> -   a brightness level
+> -   a location
+> -   a name
+>
+> A Home has:
+> -   a temperature
+> -   a set of lights
 
 ### 4. Sneaker Store
 
@@ -83,7 +132,26 @@ This app will allow customers to browse a list of products (sneakers, in this
 case), add those products to a cart, and save that cart as a past order once the
 purchase is complete.
 
-> Answer here
+> There are a lot of possible entities here -- e-commerce has lots of moving
+> parts. For starters, the description explicitly mentions products, orders, and
+> a cart (which at the end of the day is really just an in-progress order).
+> On top of that you can make the argument that there should be an intermediary
+> entity -- an 'order item' or 'line item' -- which adds extra information like
+> how much of a particular product should be added to the order.
+>
+> A Product has:
+> -   a name
+> -   a description
+> -   a price
+>
+> An Order Item has:
+> -   a product
+> -   a quantity
+>
+> An Order has:
+> -   a set of order items
+> -   a status (i.e. 'in progress', 'completed')
+> -   a date of when the order was completed
 
 ## Representing Abstractions in Code
 
@@ -139,7 +207,17 @@ var exampleLine = {
 
 What are some advantages and disadvantages of choosing these representations? Please give at least one example of each.
 
-> Answer here
+> One **major disadvantage** of this approach is that the app's purpose is to
+> tell travellers how many stops they need to go in order to get from one
+> station to another; that information is **not being stored** in the
+> representationabove. It might be possible to do so by adding an extra
+> 'line position' property to each station, but this is a bit awkward. It might
+> be better (or at least more natural) for the line to represent its set of
+> stations using an array.
+>
+> However, one advantage to this approach is that each station can be referenced
+> by its name; if you use an array to represent the set of stations, you need to
+> look up which station is at which position any time you want to access it.
 
 ### 6. Doctor Appointment App
 
@@ -242,7 +320,26 @@ Under what circumstances might one representation be a better choice than the
 other? Are there any circumstances in which the other representation might be
 the better choice?
 
-> Answer here
+> The first approach roots all other representations inside the representation
+> of a doctor. This makes finding all of the appointments that one doctor has
+> easy; however, finding all the appointments a particular _patient_ has across
+> multiple doctors will be tricker -- you would have to iterate through every
+> doctor, and then for each doctor, iterate through every one of their
+> appointments. Another concern is that since appointments only have a field
+> for a patient, there's no way to know (just by looking at the appointment)
+> who the doctor in question is, or even if there is one.
+>
+> In the second approach, it'll be a bit harder to find all appointments
+> involving a given doctor -- you'll have to walk through all of the
+> appointments on the list; however, this will also be true of finding all
+> appointments involving a given patient, which is simpler than in the first
+> approach.
+>
+> In choosing between one or the other, one key consideration is how often
+> users will need to see all of a doctor's appointments vs all of a patient's
+> appointments. For isntance, if the app is focused on tracking how doctors are
+> spending their time, maybe looking up all of the appointment records
+> associated with one patient is not something you'll need to do very often.
 
 ## Tying It Together
 
@@ -253,13 +350,74 @@ You've been tasked with building an in-browser tic-tac-toe game.
 a.  What are some possible entities that your application might use to model its
     data? Please pick at least two, with at least two properties apiece.
 
-  > Answer here
+  > A Player has...
+  > -   a username
+  > -   a URL to an avatar image
+  >
+  > A Game has...
+  > -   an X player
+  > -   an O player
+  > -   a set of moves that have been made by X and O
+  >
+  > A Move has...
+  > -   a player token (X or O)
+  > -   a position (perhaps a number from 0 - 8, representing each cell)
 
 b.  How might those entities be represented in JavaScript code?
 
-  > Answer here
+  > Here is one possible representation.
+
+  ```js
+  var examplePlayer = {
+    username: 'rickest_rick_there_is',
+    avatarURL: 'http://imgur.com/...'
+  };
+  var exampleMove = {
+    playerToken: 'X',
+    position: 3
+  };
+  var exampleGame = {
+    xPlayer: {
+      username: 'rickest_rick_there_is',
+      avatarURL: 'http://imgur.com/...'
+    },
+    oPlayer: {
+      username: 'morty',
+      avatarURL: 'http://imgur.com/...'
+    },
+    moves: [
+      {
+        playerToken: 'X',
+        position: 4
+      },
+      {
+        playerToken: 'O',
+        position: 2
+      },
+      {
+        playerToken: 'X',
+        position: 6
+      }
+    ]
+  };
+  ```
 
 c.  Justify your choices in a) and b). Why these entities? Why these
     representations?
 
-  > Answer here
+  > There must obviously be some representation of a game. The state of that
+  > game could be modeled in a variety of ways; for example, as a 'board' that's
+  > filled with 'pieces', or as a list of 'moves' made over time.
+  >
+  > An advantage to the first approach is that calculating three-in-a-row is a
+  > little easier. An advantage to the second approach is that it allows you to
+  > perfectly reconstruct the history of a game (whereas with only having a
+  > board, you'd have to guess). Neither of these advantages is so significant
+  > that one is a clear choice over the other. I opted for the second.
+  >
+  > In the second approach, each move would consist of a token placed (i.e. X
+  > or O) and a particular location on the board, and each game would consist of
+  > a set of moves; given that order of moves matters, it makes sense to
+  > represent that set of moves with an array. From there, it's just a question
+  > of how you associate two players; in this example, I chose to store each
+  > player under a separate property of the game.
